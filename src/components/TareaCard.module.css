@@ -188,3 +188,8 @@
 .progressFill[data-estado='proxima'] { background: var(--warn); }
 .progressFill[data-estado='hoy']     { background: var(--danger); }
 .progressFill[data-estado='vencida'] { background: var(--danger); opacity: 0.4; }
+
+/* On mobile, always show admin action buttons (no hover) */
+@media (max-width: 700px) {
+  .acciones { opacity: 1; }
+}

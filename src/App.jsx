@@ -9,18 +9,16 @@ import PantallaSetup from './components/PantallaSetup'
 import styles from './App.module.css'
 
 const FILTROS = [
-  { key: 'todas',     label: 'Todas',        icono: '◈' },
-  { key: 'pendiente', label: 'A tiempo',      icono: '○' },
-  { key: 'proxima',   label: 'Esta semana',   icono: '◑' },
-  { key: 'hoy',       label: 'Para hoy',      icono: '●' },
-  { key: 'vencida',   label: 'Atrasadas',     icono: '✕' },
-  { key: 'expirada',  label: 'Archivadas',    icono: '◻' },
+  { key: 'todas',     label: 'Todas',       icono: '◈' },
+  { key: 'pendiente', label: 'A tiempo',     icono: '○' },
+  { key: 'proxima',   label: 'Esta semana',  icono: '◑' },
+  { key: 'hoy',       label: 'Para hoy',     icono: '●' },
+  { key: 'vencida',   label: 'Atrasadas',    icono: '✕' },
+  { key: 'expirada',  label: 'Archivadas',   icono: '◻' },
 ]
 
 export default function App() {
-  // Show setup screen immediately if .env.local is missing
   if (!supabaseConfigurado) return <PantallaSetup />
-
   return <AppInterna />
 }
 
@@ -69,9 +67,40 @@ function AppInterna() {
     )
   }
 
+  // On mobile, show login as a full replacement page — no content bleeding through
+  if (mostrarLogin && !esAdmin) {
+    return (
+      <LoginAdmin
+        onLogin={handleLogin}
+        error={errorAuth}
+        onLimpiarError={limpiarError}
+        onCancelar={() => { setMostrarLogin(false); limpiarError() }}
+      />
+    )
+  }
+
   return (
     <div className={styles.layout}>
-      {/* Sidebar */}
+
+      {/* ── MOBILE TOP BAR ── */}
+      <div className={styles.mobileTopBar}>
+        <div className={styles.mobileLogo}>
+          <span className={styles.mobileLogoIcon}>✦</span>
+          <span className={styles.mobileLogoTitle}>Misiones</span>
+        </div>
+        {esAdmin ? (
+          <button className={`${styles.mobileAdminBtn} ${styles.active}`} onClick={cerrarSesion}>
+            <span className={styles.mobileAdminDot} />
+            Cerrar sesión
+          </button>
+        ) : (
+          <button className={styles.mobileAdminBtn} onClick={() => setMostrarLogin(true)}>
+            Acceso admin
+          </button>
+        )}
+      </div>
+
+      {/* ── DESKTOP SIDEBAR ── */}
       <aside className={styles.sidebar}>
         <div className={styles.logo}>
           <span className={styles.logoIcon}>✦</span>
@@ -120,7 +149,6 @@ function AppInterna() {
           </button>
         )}
 
-        {/* Admin session — always visible including mobile */}
         <div className={styles.sessionRow}>
           {esAdmin ? (
             <>
@@ -146,10 +174,10 @@ function AppInterna() {
         </div>
       </aside>
 
-      {/* Main */}
+      {/* ── MAIN ── */}
       <main className={styles.main}>
 
-        {/* Hero header */}
+        {/* Hero */}
         <div className={styles.hero}>
           <span className={styles.heroSupra}>bitácora viajera</span>
           <h1 className={styles.heroTitle}>Misiones</h1>
@@ -163,94 +191,111 @@ function AppInterna() {
           </div>
         ) : (
           <>
-        <header className={styles.topbar}>
-          <div className={styles.topbarLeft}>
-            <h2 className={styles.pageTitle}>
-              {FILTROS.find(f => f.key === filtro)?.label || 'Misiones'}
-            </h2>
-            <span className={styles.pageCount}>
-              {tareasFiltradas.length} misión{tareasFiltradas.length !== 1 ? 'es' : ''}
-            </span>
-          </div>
-          <div className={styles.topbarRight}>
-            <div className={styles.searchWrap}>
-              <span className={styles.searchIcon}>⌕</span>
-              <input
-                type="text"
-                placeholder="Buscar..."
-                value={busqueda}
-                onChange={e => setBusqueda(e.target.value)}
-                className={styles.searchInput}
-              />
-              {busqueda && (
-                <button className={styles.searchClear} onClick={() => setBusqueda('')}>✕</button>
+            {/* Mobile filter chips */}
+            <div className={styles.mobileFilters}>
+              {FILTROS.map(f => {
+                const count = f.key === 'todas' ? tareas.length : (contadores[f.key] || 0)
+                return (
+                  <button
+                    key={f.key}
+                    className={`${styles.mobileChip} ${filtro === f.key ? styles.chipActive : ''}`}
+                    onClick={() => setFiltro(f.key)}
+                  >
+                    {f.label}
+                    {count > 0 && <span className={styles.mobileChipCount}>{count}</span>}
+                  </button>
+                )
+              })}
+              <button
+                className={`${styles.mobileChip} ${vista === 'bitacora' ? styles.chipActive : ''}`}
+                onClick={() => setVista(v => v === 'bitacora' ? 'misiones' : 'bitacora')}
+              >
+                🗺 Bitácora
+              </button>
+            </div>
+
+            {/* Topbar (search + desktop + button) */}
+            <header className={styles.topbar}>
+              <div className={styles.topbarLeft}>
+                <h2 className={styles.pageTitle}>
+                  {FILTROS.find(f => f.key === filtro)?.label || 'Misiones'}
+                </h2>
+                <span className={styles.pageCount}>
+                  {tareasFiltradas.length} misión{tareasFiltradas.length !== 1 ? 'es' : ''}
+                </span>
+              </div>
+              <div className={styles.topbarRight}>
+                <div className={styles.searchWrap}>
+                  <span className={styles.searchIcon}>⌕</span>
+                  <input
+                    type="text"
+                    placeholder="Buscar..."
+                    value={busqueda}
+                    onChange={e => setBusqueda(e.target.value)}
+                    className={styles.searchInput}
+                  />
+                  {busqueda && (
+                    <button className={styles.searchClear} onClick={() => setBusqueda('')}>✕</button>
+                  )}
+                </div>
+                {esAdmin && (
+                  <button className={styles.btnNueva} onClick={() => setMostrarForm(true)}>
+                    <span>+</span> Nueva misión
+                  </button>
+                )}
+              </div>
+            </header>
+
+            {/* Cards grid */}
+            <div className={styles.grid}>
+              {dbError ? (
+                <div className={styles.errorBanner}>
+                  ⚠️ Error al conectar con la base de datos: {dbError}
+                </div>
+              ) : cargandoTareas ? (
+                <div className={styles.empty}>
+                  <p style={{ color: 'var(--text-muted)' }}>Cargando misiones...</p>
+                </div>
+              ) : tareasFiltradas.length === 0 ? (
+                <div className={styles.empty}>
+                  <div className={styles.emptyIcon}>
+                    {busqueda ? '🔍' : filtro === 'expirada' ? '✓' : '📋'}
+                  </div>
+                  <p>
+                    {busqueda
+                      ? `Sin resultados para "${busqueda}"`
+                      : filtro === 'todas'
+                      ? esAdmin
+                        ? 'No hay misiones aún. ¡Crea la primera!'
+                        : 'No hay misiones publicadas todavía.'
+                      : `No hay misiones en "${FILTROS.find(f => f.key === filtro)?.label}".`
+                    }
+                  </p>
+                </div>
+              ) : (
+                tareasFiltradas.map(tarea => (
+                  <TareaCard
+                    key={tarea.id}
+                    tarea={tarea}
+                    esAdmin={esAdmin}
+                    onEliminar={eliminarTarea}
+                    onEditar={setTareaEditando}
+                  />
+                ))
               )}
             </div>
+
+            {/* Mobile FAB */}
             {esAdmin && (
-              <button className={styles.btnNueva} onClick={() => setMostrarForm(true)}>
-                <span>+</span> Nueva misión
+              <button className={styles.fab} onClick={() => setMostrarForm(true)}>
+                <span className={styles.fabIcon}>+</span>
               </button>
             )}
-          </div>
-        </header>
-
-        <div className={styles.grid}>
-          {dbError ? (
-            <div className={styles.errorBanner}>
-              ⚠️ Error al conectar con la base de datos: {dbError}
-            </div>
-          ) : cargandoTareas ? (
-            <div className={styles.empty}>
-              <p style={{ color: 'var(--text-muted)' }}>Cargando misiones...</p>
-            </div>
-          ) : tareasFiltradas.length === 0 ? (
-            <div className={styles.empty}>
-              <div className={styles.emptyIcon}>
-                {busqueda ? '🔍' : filtro === 'expirada' ? '✓' : '📋'}
-              </div>
-              <p>
-                {busqueda
-                  ? `Sin resultados para "${busqueda}"`
-                  : filtro === 'todas'
-                  ? esAdmin
-                    ? 'No hay misiones aún. ¡Crea la primera!'
-                    : 'No hay misiones publicadas todavía.'
-                  : `No hay misiones en "${FILTROS.find(f => f.key === filtro)?.label}".`
-                }
-              </p>
-              {esAdmin && filtro === 'todas' && !busqueda && (
-                <button className={styles.btnNueva} onClick={() => setMostrarForm(true)}>
-                  + Agregar misión
-                </button>
-              )}
-            </div>
-          ) : (
-            tareasFiltradas.map(tarea => (
-              <TareaCard
-                key={tarea.id}
-                tarea={tarea}
-                esAdmin={esAdmin}
-                onEliminar={eliminarTarea}
-                onEditar={setTareaEditando}
-              />
-            ))
-          )}
-        </div>
           </>
         )}
       </main>
 
-      {/* Modal: login */}
-      {mostrarLogin && !esAdmin && (
-        <LoginAdmin
-          onLogin={handleLogin}
-          error={errorAuth}
-          onLimpiarError={limpiarError}
-          onCancelar={() => { setMostrarLogin(false); limpiarError() }}
-        />
-      )}
-
-      {/* Modal: nueva tarea */}
+      {/* Modal: nueva misión */}
       {esAdmin && mostrarForm && (
         <FormularioTarea
           onAgregar={handleAgregar}
@@ -258,7 +303,7 @@ function AppInterna() {
         />
       )}
 
-      {/* Modal: editar tarea */}
+      {/* Modal: editar misión */}
       {esAdmin && tareaEditando && (
         <FormularioTarea
           tareaInicial={tareaEditando}
