@@ -1,7 +1,7 @@
 .wrap {
   position: fixed;
   inset: 0;
-  background: rgba(250, 247, 245, 0.92);
+  background: var(--surface-glass);
   background-image: radial-gradient(ellipse 60% 50% at 50% 0%, rgba(232,64,122,0.06) 0%, transparent 70%);
   backdrop-filter: blur(8px);
   -webkit-backdrop-filter: blur(8px);
