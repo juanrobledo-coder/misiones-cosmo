@@ -160,12 +160,28 @@
   border-top: 1px solid var(--border);
 }
 
-.footerNote {
-  font-size: 0.7rem;
-  color: var(--text-muted);
-  line-height: 1.5;
+.temaBtn {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  background: var(--surface2);
+  border: 1px solid var(--border-light);
+  color: var(--text-soft);
+  font-family: var(--font-main);
+  font-size: 0.78rem;
+  font-weight: 600;
+  padding: 8px 10px;
+  border-radius: var(--radius);
+  cursor: pointer;
+  transition: all 0.15s;
 }
-.footerNote strong { color: var(--accent); }
+.temaBtn:hover { border-color: var(--accent); color: var(--accent); background: var(--accent-dim); }
+
+.temaIcon {
+  font-size: 0.85rem;
+  line-height: 1;
+}
 
 /* ── Hero header ── */
 .hero {
@@ -227,6 +243,7 @@
   display: flex;
   flex-direction: column;
   min-width: 0;
+  position: relative;
 }
 
 .topbar {
@@ -388,6 +405,28 @@
   flex-direction: column;
   gap: 6px;
 }
+
+/* ── FAB tema (mobile, izquierda, siempre visible) ── */
+.fabTema {
+  display: none;
+  position: fixed;
+  bottom: 1.5rem;
+  left: 1.25rem;
+  z-index: 40;
+  align-items: center;
+  justify-content: center;
+  background: var(--surface2);
+  color: var(--text-soft);
+  border: 1px solid var(--border-light);
+  border-radius: 99px;
+  width: 48px;
+  height: 48px;
+  box-shadow: 0 4px 20px rgba(0,0,0,0.12);
+  cursor: pointer;
+  transition: transform 0.15s, background 0.15s, color 0.15s;
+}
+.fabTema:active { transform: scale(0.96); }
+.fabTema .fabIcon { font-size: 1.1rem; }
 
 /* ═══════════════════════════════════════
    MOBILE  (≤ 700px)  — full redesign
@@ -555,7 +594,7 @@
     padding-bottom: 6rem; /* space above FAB */
   }
 
-  /* ── FAB ── */
+  /* ── FAB (nueva misión, derecha) ── */
   .fab {
     display: flex;
     position: fixed;
@@ -584,6 +623,9 @@
     line-height: 1;
     font-weight: 400;
   }
+
+  /* ── FAB (tema, izquierda) ── */
+  .fabTema { display: flex; }
 }
 
 /* Desktop: hide mobile-only elements */
@@ -591,4 +633,5 @@
   .mobileTopBar  { display: none; }
   .mobileFilters { display: none; }
   .fab           { display: none; }
+  .fabTema       { display: none; }
 }

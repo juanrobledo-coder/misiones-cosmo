@@ -1,6 +1,7 @@
 import { useState } from 'react'
 import { useTareas } from './useTareas'
 import { useAuth } from './useAuth'
+import { useTema } from './useTema'
 import { supabaseConfigurado } from './supabase'
 import FormularioTarea from './components/FormularioTarea'
 import TareaCard from './components/TareaCard'
@@ -25,6 +26,7 @@ export default function App() {
 function AppInterna() {
   const { tareas, contadores, cargando: cargandoTareas, dbError, agregarTarea, eliminarTarea, editarTarea, limpiarExpiradas } = useTareas()
   const { esAdmin, cargando: cargandoAuth, error: errorAuth, iniciarSesion, cerrarSesion, limpiarError } = useAuth()
+  const { tema, alternarTema } = useTema()
 
   const [mostrarForm, setMostrarForm]     = useState(false)
   const [tareaEditando, setTareaEditando] = useState(null)
@@ -168,9 +170,10 @@ function AppInterna() {
         </div>
 
         <div className={styles.sidebarFooter}>
-          <div className={styles.footerNote}>
-            Las misiones se archivan automáticamente <strong>5 días</strong> después de la entrega.
-          </div>
+          <button className={styles.temaBtn} onClick={alternarTema}>
+            <span className={styles.temaIcon}>{tema === 'dark' ? '☀' : '☾'}</span>
+            {tema === 'dark' ? 'Modo claro' : 'Modo oscuro'}
+          </button>
         </div>
       </aside>
 
@@ -285,7 +288,7 @@ function AppInterna() {
               )}
             </div>
 
-            {/* Mobile FAB */}
+            {/* Mobile FAB — nueva misión (admin) */}
             {esAdmin && (
               <button className={styles.fab} onClick={() => setMostrarForm(true)}>
                 <span className={styles.fabIcon}>+</span>
@@ -293,6 +296,11 @@ function AppInterna() {
             )}
           </>
         )}
+
+        {/* Mobile FAB — tema (siempre visible, izquierda) */}
+        <button className={styles.fabTema} onClick={alternarTema} aria-label="Cambiar tema">
+          <span className={styles.fabIcon}>{tema === 'dark' ? '☀' : '☾'}</span>
+        </button>
       </main>
 
       {/* Modal: nueva misión */}

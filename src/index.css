@@ -24,6 +24,28 @@
   --font-mono: 'DM Mono', monospace;
 }
 
+[data-theme='dark'] {
+  --bg: #14100d;
+  --surface: #1c1712;
+  --surface2: #221c16;
+  --surface3: #2a231c;
+  --border: #362d24;
+  --border-light: #453a2f;
+  --text: #f5efe9;
+  --text-muted: #7d6f65;
+  --text-soft: #bfb2a8;
+  --accent: #ff5c96;
+  --accent-dim: rgba(255, 92, 150, 0.14);
+  --accent-hover: #ff77a8;
+  --danger: #ff5c5c;
+  --danger-dim: rgba(255, 92, 92, 0.12);
+  --warn: #e0952e;
+  --warn-dim: rgba(224, 149, 46, 0.14);
+  --ok: #34c37c;
+  --ok-dim: rgba(52, 195, 124, 0.12);
+  --expired: #5c534b;
+}
+
 *, *::before, *::after {
   box-sizing: border-box;
   margin: 0;
@@ -44,6 +66,7 @@ body {
   background-image:
     radial-gradient(ellipse 80% 40% at 50% -10%, rgba(232,64,122,0.05) 0%, transparent 70%);
   min-height: 100vh;
+  transition: background-color 0.2s ease, color 0.2s ease;
 }
 
 #root {
