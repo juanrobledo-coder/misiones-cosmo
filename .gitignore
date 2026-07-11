@@ -3,4 +3,5 @@ dist
 .env.local
 .env
 .DS_Store
+pnpm-lock.yaml
 DEPLOYMENT.md
