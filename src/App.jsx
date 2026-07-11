@@ -1,4 +1,5 @@
 import { useState } from 'react'
+import { Layers, CircleCheck, CalendarDays, Clock, XCircle, Archive, BookOpen, Search } from 'lucide-react'
 import { useTareas } from './useTareas'
 import { useAuth } from './useAuth'
 import { useTema } from './useTema'
@@ -10,12 +11,12 @@ import PantallaSetup from './components/PantallaSetup'
 import styles from './App.module.css'
 
 const FILTROS = [
-  { key: 'todas',     label: 'Todas',       icono: '◈' },
-  { key: 'pendiente', label: 'A tiempo',     icono: '○' },
-  { key: 'proxima',   label: 'Esta semana',  icono: '◑' },
-  { key: 'hoy',       label: 'Para hoy',     icono: '●' },
-  { key: 'vencida',   label: 'Atrasadas',    icono: '✕' },
-  { key: 'expirada',  label: 'Archivadas',   icono: '◻' },
+  { key: 'todas',     label: 'Todas',       Icono: Layers },
+  { key: 'pendiente', label: 'A tiempo',     Icono: CircleCheck },
+  { key: 'proxima',   label: 'Esta semana',  Icono: CalendarDays },
+  { key: 'hoy',       label: 'Para hoy',     Icono: Clock },
+  { key: 'vencida',   label: 'Atrasadas',    Icono: XCircle },
+  { key: 'expirada',  label: 'Archivadas',   Icono: Archive },
 ]
 
 export default function App() {
@@ -124,7 +125,7 @@ function AppInterna() {
                 onClick={() => { setVista('misiones'); setFiltro(f.key) }}
               >
                 <span className={styles.navLabel}>
-                  <span className={styles.navIcono}>{f.icono}</span>
+                  <span className={styles.navIcono}><f.Icono size={14} strokeWidth={2.25} /></span>
                   {f.label}
                 </span>
                 {count > 0 && <span className={styles.navCount}>{count}</span>}
@@ -139,7 +140,7 @@ function AppInterna() {
             onClick={() => setVista(v => v === 'bitacora' ? 'misiones' : 'bitacora')}
           >
             <span className={styles.navLabel}>
-              <span className={styles.navIcono}>🗺</span>
+              <span className={styles.navIcono}><BookOpen size={14} strokeWidth={2.25} /></span>
               Bitácora
             </span>
           </button>
@@ -196,6 +197,7 @@ function AppInterna() {
                 className={`${styles.mobileChip} ${vista === 'misiones' && filtro === f.key ? styles.chipActive : ''}`}
                 onClick={() => { setVista('misiones'); setFiltro(f.key) }}
               >
+                <f.Icono size={13} strokeWidth={2.25} />
                 {f.label}
                 {count > 0 && <span className={styles.mobileChipCount}>{count}</span>}
               </button>
@@ -205,7 +207,8 @@ function AppInterna() {
             className={`${styles.mobileChip} ${vista === 'bitacora' ? styles.chipActive : ''}`}
             onClick={() => setVista(v => v === 'bitacora' ? 'misiones' : 'bitacora')}
           >
-            🗺 Bitácora
+            <BookOpen size={13} strokeWidth={2.25} />
+            Bitácora
           </button>
         </div>
 
@@ -229,7 +232,7 @@ function AppInterna() {
               </div>
               <div className={styles.topbarRight}>
                 <div className={styles.searchWrap}>
-                  <span className={styles.searchIcon}>⌕</span>
+                  <Search size={14} strokeWidth={2.25} className={styles.searchIcon} />
                   <input
                     type="text"
                     placeholder="Buscar..."
