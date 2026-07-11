@@ -186,6 +186,29 @@ function AppInterna() {
           <h1 className={styles.heroTitle}>Misiones</h1>
         </div>
 
+        {/* Mobile filter chips — always visible so "Bitácora" stays reachable to toggle back */}
+        <div className={styles.mobileFilters}>
+          {FILTROS.map(f => {
+            const count = f.key === 'todas' ? tareas.length : (contadores[f.key] || 0)
+            return (
+              <button
+                key={f.key}
+                className={`${styles.mobileChip} ${vista === 'misiones' && filtro === f.key ? styles.chipActive : ''}`}
+                onClick={() => { setVista('misiones'); setFiltro(f.key) }}
+              >
+                {f.label}
+                {count > 0 && <span className={styles.mobileChipCount}>{count}</span>}
+              </button>
+            )
+          })}
+          <button
+            className={`${styles.mobileChip} ${vista === 'bitacora' ? styles.chipActive : ''}`}
+            onClick={() => setVista(v => v === 'bitacora' ? 'misiones' : 'bitacora')}
+          >
+            🗺 Bitácora
+          </button>
+        </div>
+
         {vista === 'bitacora' ? (
           <div className={styles.bitacoraPlaceholder}>
             <div className={styles.bitacoraIcon}>🗺</div>
@@ -194,29 +217,6 @@ function AppInterna() {
           </div>
         ) : (
           <>
-            {/* Mobile filter chips */}
-            <div className={styles.mobileFilters}>
-              {FILTROS.map(f => {
-                const count = f.key === 'todas' ? tareas.length : (contadores[f.key] || 0)
-                return (
-                  <button
-                    key={f.key}
-                    className={`${styles.mobileChip} ${filtro === f.key ? styles.chipActive : ''}`}
-                    onClick={() => setFiltro(f.key)}
-                  >
-                    {f.label}
-                    {count > 0 && <span className={styles.mobileChipCount}>{count}</span>}
-                  </button>
-                )
-              })}
-              <button
-                className={`${styles.mobileChip} ${vista === 'bitacora' ? styles.chipActive : ''}`}
-                onClick={() => setVista(v => v === 'bitacora' ? 'misiones' : 'bitacora')}
-              >
-                🗺 Bitácora
-              </button>
-            </div>
-
             {/* Topbar (search + desktop + button) */}
             <header className={styles.topbar}>
               <div className={styles.topbarLeft}>
