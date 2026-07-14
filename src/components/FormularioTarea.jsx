@@ -1,4 +1,5 @@
-import { useState } from 'react'
+import { useState, useRef } from 'react'
+import { ImagePlus, X, Upload } from 'lucide-react'
 import styles from './FormularioTarea.module.css'
 
 const MATERIAS = [
@@ -9,26 +10,55 @@ const hoy = () => new Date().toISOString().split('T')[0]
 
 export default function FormularioTarea({ onAgregar, onCancelar, tareaInicial }) {
   const [form, setForm] = useState({
-    titulo: tareaInicial?.titulo || '',
-    descripcion: tareaInicial?.descripcion || '',
-    materia: tareaInicial?.materia || MATERIAS[0],
+    titulo:           tareaInicial?.titulo || '',
+    descripcion:      tareaInicial?.descripcion || '',
+    materia:          tareaInicial?.materia || MATERIAS[0],
     fechaVencimiento: tareaInicial?.fechaVencimiento
       ? new Date(tareaInicial.fechaVencimiento).toISOString().split('T')[0]
       : '',
   })
-  const [error, setError] = useState('')
+  const [error, setError]           = useState('')
+  const [enviando, setEnviando]     = useState(false)
+  const [imagen, setImagen]         = useState(null)          // File object
+  const [preview, setPreview]       = useState(tareaInicial?.imagenUrl || null)
+  const [eliminarImg, setEliminarImg] = useState(false)
+  const inputFileRef                = useRef()
 
   function handleChange(e) {
     setForm(f => ({ ...f, [e.target.name]: e.target.value }))
     setError('')
   }
 
-  function handleSubmit(e) {
+  function handleImagen(e) {
+    const archivo = e.target.files?.[0]
+    if (!archivo) return
+    if (!archivo.type.startsWith('image/')) return setError('Solo se permiten imágenes.')
+    if (archivo.size > 5 * 1024 * 1024) return setError('La imagen no puede superar 5 MB.')
+    setImagen(archivo)
+    setPreview(URL.createObjectURL(archivo))
+    setEliminarImg(false)
+    setError('')
+  }
+
+  function handleQuitarImagen() {
+    setImagen(null)
+    setPreview(null)
+    setEliminarImg(true)
+    if (inputFileRef.current) inputFileRef.current.value = ''
+  }
+
+  async function handleSubmit(e) {
     e.preventDefault()
     if (!form.titulo.trim()) return setError('El título es obligatorio.')
     if (!form.fechaVencimiento) return setError('La fecha de entrega es obligatoria.')
     if (form.fechaVencimiento < hoy()) return setError('La fecha no puede ser en el pasado.')
-    onAgregar(form)
+    setEnviando(true)
+    try {
+      await onAgregar({ ...form, imagen, eliminarImagen: eliminarImg })
+    } catch (err) {
+      setError('Error al guardar. Intenta de nuevo.')
+      setEnviando(false)
+    }
   }
 
   return (
@@ -55,7 +85,9 @@ export default function FormularioTarea({ onAgregar, onCancelar, tareaInicial })
           </div>
 
           <div className={styles.field}>
-            <label htmlFor="descripcion">Descripción <span className={styles.opcional}>(opcional)</span></label>
+            <label htmlFor="descripcion">
+              Descripción <span className={styles.opcional}>(opcional)</span>
+            </label>
             <textarea
               id="descripcion"
               name="descripcion"
@@ -63,6 +95,40 @@ export default function FormularioTarea({ onAgregar, onCancelar, tareaInicial })
               value={form.descripcion}
               onChange={handleChange}
               rows={3}
+            />
+          </div>
+
+          {/* Image upload */}
+          <div className={styles.field}>
+            <label>Imagen <span className={styles.opcional}>(opcional · máx. 5 MB)</span></label>
+            {preview ? (
+              <div className={styles.previewWrap}>
+                <img src={preview} alt="Vista previa" className={styles.previewImg} />
+                <button
+                  type="button"
+                  className={styles.previewQuitar}
+                  onClick={handleQuitarImagen}
+                  title="Quitar imagen"
+                >
+                  <X size={14} />
+                </button>
+              </div>
+            ) : (
+              <button
+                type="button"
+                className={styles.uploadBtn}
+                onClick={() => inputFileRef.current?.click()}
+              >
+                <ImagePlus size={18} strokeWidth={1.75} />
+                <span>Seleccionar imagen</span>
+              </button>
+            )}
+            <input
+              ref={inputFileRef}
+              type="file"
+              accept="image/*"
+              onChange={handleImagen}
+              style={{ display: 'none' }}
             />
           </div>
 
@@ -94,9 +160,14 @@ export default function FormularioTarea({ onAgregar, onCancelar, tareaInicial })
           </div>
 
           <div className={styles.actions}>
-            <button type="button" className={styles.btnSecundario} onClick={onCancelar}>Cancelar</button>
-            <button type="submit" className={styles.btnPrimario}>
-              {tareaInicial ? 'Guardar cambios' : 'Crear misión'}
+            <button type="button" className={styles.btnSecundario} onClick={onCancelar}>
+              Cancelar
+            </button>
+            <button type="submit" className={styles.btnPrimario} disabled={enviando}>
+              {enviando
+                ? <><Upload size={14} strokeWidth={2.5} /> Guardando...</>
+                : tareaInicial ? 'Guardar cambios' : 'Crear misión'
+              }
             </button>
           </div>
         </form>

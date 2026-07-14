@@ -16,6 +16,8 @@
   border-radius: var(--radius-lg);
   width: 100%;
   max-width: 520px;
+  max-height: 90vh;
+  overflow-y: auto;
   animation: slideDown 0.25s ease forwards;
   box-shadow: 0 24px 64px rgba(100, 60, 50, 0.18), 0 0 0 1px rgba(232,64,122,0.05);
 }
@@ -26,6 +28,10 @@
   gap: 10px;
   padding: 1.25rem 1.5rem 1rem;
   border-bottom: 1px solid var(--border);
+  position: sticky;
+  top: 0;
+  background: var(--surface2);
+  z-index: 1;
 }
 
 .header h2 {
@@ -41,7 +47,7 @@
   font-weight: 500;
   background: var(--accent-dim);
   color: var(--accent);
-  border: 1px solid rgba(232,255,71,0.25);
+  border: 1px solid rgba(232,64,122,0.25);
   padding: 2px 8px;
   border-radius: 4px;
   letter-spacing: 0.08em;
@@ -108,7 +114,7 @@
 .field textarea:focus,
 .field select:focus {
   border-color: var(--accent);
-  box-shadow: 0 0 0 3px rgba(232,255,71,0.08);
+  box-shadow: 0 0 0 3px rgba(232,64,122,0.08);
 }
 
 .field input[type="date"]::-webkit-calendar-picker-indicator {
@@ -126,6 +132,63 @@
 }
 
 .field select option { background: var(--surface2); }
+
+/* ── Image upload ── */
+.uploadBtn {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  background: var(--surface);
+  border: 2px dashed var(--border-light);
+  border-radius: var(--radius);
+  color: var(--text-muted);
+  font-family: var(--font-main);
+  font-size: 0.85rem;
+  font-weight: 500;
+  padding: 14px 16px;
+  cursor: pointer;
+  width: 100%;
+  transition: border-color 0.15s, color 0.15s, background 0.15s;
+}
+.uploadBtn:hover {
+  border-color: var(--accent);
+  color: var(--accent);
+  background: var(--accent-dim);
+}
+
+.previewWrap {
+  position: relative;
+  border-radius: var(--radius);
+  overflow: hidden;
+  background: var(--surface3);
+  line-height: 0;
+}
+
+.previewImg {
+  width: 100%;
+  max-height: 200px;
+  object-fit: cover;
+  border-radius: var(--radius);
+  display: block;
+}
+
+.previewQuitar {
+  position: absolute;
+  top: 8px;
+  right: 8px;
+  background: rgba(0,0,0,0.55);
+  border: none;
+  color: #fff;
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: background 0.15s;
+}
+.previewQuitar:hover { background: rgba(0,0,0,0.8); }
 
 .row {
   display: grid;
@@ -151,7 +214,6 @@
   padding: 8px 12px;
   line-height: 1.5;
 }
-
 .note strong { color: var(--accent); }
 
 .actions {
@@ -173,12 +235,15 @@
   cursor: pointer;
   transition: all 0.15s;
 }
-.btnSecundario:hover { border-color: #555; color: var(--text); }
+.btnSecundario:hover { border-color: #888; color: var(--text); }
 
 .btnPrimario {
+  display: flex;
+  align-items: center;
+  gap: 6px;
   background: var(--accent);
   border: none;
-  color: #0d0d0d;
+  color: #fff;
   font-family: var(--font-main);
   font-size: 0.85rem;
   font-weight: 700;
@@ -190,3 +255,15 @@
 }
 .btnPrimario:hover { background: var(--accent-hover); transform: translateY(-1px); }
 .btnPrimario:active { transform: translateY(0); }
+.btnPrimario:disabled { opacity: 0.6; cursor: not-allowed; transform: none; }
+
+@media (max-width: 700px) {
+  .overlay {
+    align-items: flex-end;
+    padding: 0;
+  }
+  .modal {
+    border-radius: var(--radius-lg) var(--radius-lg) 0 0;
+    max-height: 92vh;
+  }
+}
