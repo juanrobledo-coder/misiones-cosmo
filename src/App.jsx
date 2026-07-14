@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import { Layers, CircleCheck, CalendarDays, Clock, XCircle, Archive, BookOpen, Search } from 'lucide-react'
+import { Layers, CircleCheck, CalendarDays, Clock, XCircle, Archive, BookOpen, Search, Sun, Moon, Plus } from 'lucide-react'
 import { useTareas } from './useTareas'
 import { useAuth } from './useAuth'
 import { useTema } from './useTema'
@@ -172,7 +172,7 @@ function AppInterna() {
 
         <div className={styles.sidebarFooter}>
           <button className={styles.temaBtn} onClick={alternarTema}>
-            <span className={styles.temaIcon}>{tema === 'dark' ? '☀' : '☾'}</span>
+            <span className={styles.temaIcon}>{tema === 'dark' ? <Sun size={14} strokeWidth={2.25} /> : <Moon size={14} strokeWidth={2.25} />}</span>
             {tema === 'dark' ? 'Modo claro' : 'Modo oscuro'}
           </button>
         </div>
@@ -246,7 +246,7 @@ function AppInterna() {
                 </div>
                 {esAdmin && (
                   <button className={styles.btnNueva} onClick={() => setMostrarForm(true)}>
-                    <span>+</span> Nueva misión
+                    <Plus size={16} strokeWidth={2.5} /> Nueva misión
                   </button>
                 )}
               </div>
@@ -294,7 +294,7 @@ function AppInterna() {
             {/* Mobile FAB — nueva misión (admin) */}
             {esAdmin && (
               <button className={styles.fab} onClick={() => setMostrarForm(true)}>
-                <span className={styles.fabIcon}>+</span>
+                <Plus size={22} strokeWidth={2.5} className={styles.fabIcon} />
               </button>
             )}
           </>
@@ -302,7 +302,7 @@ function AppInterna() {
 
         {/* Mobile FAB — tema (siempre visible, izquierda) */}
         <button className={styles.fabTema} onClick={alternarTema} aria-label="Cambiar tema">
-          <span className={styles.fabIcon}>{tema === 'dark' ? '☀' : '☾'}</span>
+          {tema === 'dark' ? <Sun size={18} strokeWidth={2.25} className={styles.fabIcon} /> : <Moon size={18} strokeWidth={2.25} className={styles.fabIcon} />}
         </button>
       </main>
 
