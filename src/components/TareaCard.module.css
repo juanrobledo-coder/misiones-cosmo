@@ -5,7 +5,6 @@
   display: flex;
   flex-direction: column;
   gap: 10px;
-  height: 420px;
   transition: border-color 0.2s, box-shadow 0.2s;
   position: relative;
   overflow: hidden;
@@ -186,8 +185,6 @@
 /* ── Description area: flexes to absorb leftover space so meta/progress
    always sit at the same spot near the bottom of the fixed-height card ── */
 .descArea {
-  flex: 1;
-  min-height: 0;
   display: flex;
   flex-direction: column;
   gap: 4px;
@@ -394,7 +391,6 @@
 /* Mobile */
 @media (max-width: 700px) {
   .acciones { opacity: 1; }
-  .card { height: 380px; }
   .imagenWrap { height: 110px; }
   .detalleImg { max-height: 180px; }
 }
