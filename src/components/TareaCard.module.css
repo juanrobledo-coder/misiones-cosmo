@@ -5,6 +5,7 @@
   display: flex;
   flex-direction: column;
   gap: 10px;
+  height: 420px;
   transition: border-color 0.2s, box-shadow 0.2s;
   position: relative;
   overflow: hidden;
@@ -16,6 +17,7 @@
   position: absolute;
   top: 0; left: 0;
   width: 3px; height: 100%;
+  z-index: 1;
 }
 .pendiente::before { background: var(--ok); }
 .proxima::before   { background: var(--warn); }
@@ -30,20 +32,20 @@
 
 .expirada { opacity: 0.5; }
 
-/* ── Image banner ── */
+/* ── Image banner (fixed height, no longer grows the card) ── */
 .imagenWrap {
   position: relative;
   cursor: zoom-in;
   line-height: 0;
   overflow: hidden;
   border-radius: var(--radius-lg) var(--radius-lg) 0 0;
-  /* cancel card padding for full bleed */
-  margin: 0;
+  flex-shrink: 0;
+  height: 140px;
 }
 
 .imagen {
   width: 100%;
-  max-height: 200px;
+  height: 100%;
   object-fit: cover;
   display: block;
   transition: transform 0.3s ease;
@@ -70,19 +72,13 @@
   background: rgba(0,0,0,0.25);
 }
 
-/* Card body padding (applied to everything below image) */
-.topRow, .titulo, .desc, .metaGrid, .progressBar {
+/* Card body horizontal padding (applied to everything below the image) */
+.topRow, .titulo, .descArea, .metaGrid {
   padding-left: 1.25rem;
   padding-right: 1.25rem;
 }
 
-.topRow { padding-top: 1.25rem; }
-.progressBar { padding-bottom: 1.25rem; }
-
-/* If no image, add top padding to topRow */
-.card:not(:has(.imagenWrap)) .topRow {
-  padding-top: 1.25rem;
-}
+.topRow { padding-top: 1.25rem; flex-shrink: 0; }
 
 /* ── Top row ── */
 .topRow {
@@ -99,6 +95,7 @@
   border-radius: 4px;
   letter-spacing: 0.06em;
   text-transform: uppercase;
+  flex-shrink: 0;
 }
 
 .badge_ok      { background: var(--ok-dim);     color: var(--ok);     border: 1px solid rgba(26,158,92,0.2); }
@@ -113,6 +110,9 @@
   color: var(--text-muted);
   font-family: var(--font-mono);
   margin-right: auto;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 
 .acciones {
@@ -121,6 +121,7 @@
   align-items: center;
   opacity: 0;
   transition: opacity 0.15s;
+  flex-shrink: 0;
 }
 .card:hover .acciones { opacity: 1; }
 
@@ -164,27 +165,65 @@
   cursor: pointer;
 }
 
+/* ── Title: clamped to 2 lines with ellipsis ── */
 .titulo {
   font-size: 1rem;
   font-weight: 700;
   line-height: 1.3;
   color: var(--text);
+  flex-shrink: 0;
+  cursor: pointer;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  transition: color 0.15s;
 }
+.titulo:hover { color: var(--accent); }
 .tachado { text-decoration: line-through; color: var(--text-muted); }
+
+/* ── Description area: flexes to absorb leftover space so meta/progress
+   always sit at the same spot near the bottom of the fixed-height card ── */
+.descArea {
+  flex: 1;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
 
 .desc {
   font-size: 0.82rem;
   color: var(--text-soft);
-  line-height: 1.55;
+  line-height: 1.5;
+  display: -webkit-box;
+  -webkit-line-clamp: 3;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
 }
+
+.verMas {
+  align-self: flex-start;
+  background: none;
+  border: none;
+  color: var(--accent);
+  font-family: var(--font-main);
+  font-size: 0.75rem;
+  font-weight: 700;
+  cursor: pointer;
+  padding: 0;
+}
+.verMas:hover { text-decoration: underline; }
 
 .metaGrid {
   display: grid;
   grid-template-columns: repeat(2, 1fr);
   gap: 6px 16px;
+  flex-shrink: 0;
 }
 
-.metaItem { display: flex; flex-direction: column; gap: 1px; }
+.metaItem { display: flex; flex-direction: column; gap: 1px; min-width: 0; }
 
 .metaLabel {
   font-size: 0.62rem;
@@ -197,6 +236,9 @@
   font-size: 0.78rem;
   color: var(--text-soft);
   font-family: var(--font-mono);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 
 .color_ok     { color: var(--ok) !important; }
@@ -204,12 +246,15 @@
 .color_danger { color: var(--danger) !important; }
 .color_expired{ color: var(--expired) !important; }
 
+/* ── Progress bar — spacing via margin, NOT padding, so the fixed 3px
+   height never gets collapsed by box-sizing: border-box ── */
 .progressBar {
   height: 3px;
   background: var(--surface3);
   border-radius: 2px;
   overflow: hidden;
-  margin-top: 4px;
+  flex-shrink: 0;
+  margin: 4px 1.25rem 1.25rem;
 }
 .progressFill {
   height: 100%;
@@ -221,7 +266,7 @@
 .progressFill[data-estado='hoy']     { background: var(--danger); }
 .progressFill[data-estado='vencida'] { background: var(--danger); opacity: 0.4; }
 
-/* ── Lightbox ── */
+/* ── Lightbox (image only) ── */
 .lightbox {
   position: fixed;
   inset: 0;
@@ -264,8 +309,92 @@
   object-fit: contain;
 }
 
+/* ── Detail modal: full title + full description, opened via "Ver más" ── */
+.detalleOverlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,0.5);
+  backdrop-filter: blur(4px);
+  -webkit-backdrop-filter: blur(4px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 300;
+  padding: 1rem;
+  animation: fadeIn 0.2s ease;
+}
+
+.detalleCard {
+  background: var(--surface);
+  border-radius: var(--radius-lg);
+  width: 100%;
+  max-width: 480px;
+  max-height: 85vh;
+  overflow-y: auto;
+  position: relative;
+  box-shadow: 0 24px 64px rgba(0,0,0,0.3);
+  animation: slideDown 0.2s ease forwards;
+}
+
+.detalleCerrar {
+  position: absolute;
+  top: 12px;
+  right: 12px;
+  background: rgba(0,0,0,0.4);
+  border: 1px solid rgba(255,255,255,0.2);
+  color: #fff;
+  width: 30px;
+  height: 30px;
+  border-radius: 50%;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1;
+  transition: background 0.15s;
+}
+.detalleCerrar:hover { background: rgba(0,0,0,0.6); }
+
+.detalleImg {
+  width: 100%;
+  max-height: 240px;
+  object-fit: cover;
+  display: block;
+}
+
+.detalleBody {
+  padding: 1.5rem;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.detalleTitulo {
+  font-size: 1.1rem;
+  font-weight: 800;
+  color: var(--text);
+  line-height: 1.35;
+}
+
+.detalleDesc {
+  font-size: 0.88rem;
+  color: var(--text-soft);
+  line-height: 1.6;
+  white-space: pre-wrap;
+}
+
+.detalleBody .metaGrid {
+  padding-left: 0;
+  padding-right: 0;
+  margin-top: 4px;
+  padding-top: 12px;
+  border-top: 1px solid var(--border);
+}
+
 /* Mobile */
 @media (max-width: 700px) {
   .acciones { opacity: 1; }
-  .imagen { max-height: 160px; }
+  .card { height: 380px; }
+  .imagenWrap { height: 110px; }
+  .detalleImg { max-height: 180px; }
 }
