@@ -293,7 +293,7 @@ function AppInterna() {
 
             {/* Mobile FAB — nueva misión (admin) */}
             {esAdmin && (
-              <button className={styles.fab} onClick={() => setMostrarForm(true)}>
+              <button className={styles.fab} onClick={() => setMostrarForm(true)} aria-label="Nueva misión">
                 <Plus size={22} strokeWidth={2.5} className={styles.fabIcon} />
               </button>
             )}

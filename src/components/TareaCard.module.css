@@ -31,8 +31,11 @@
 
 .expirada { opacity: 0.5; }
 
-/* ── Image banner (fixed height, no longer grows the card) ── */
+/* ── Image banner (fixed height, no longer grows the card) — now a real
+   <button> so it's reachable and activatable by keyboard, not just mouse ── */
 .imagenWrap {
+  display: block;
+  width: 100%;
   position: relative;
   cursor: zoom-in;
   line-height: 0;
@@ -40,6 +43,9 @@
   border-radius: var(--radius-lg) var(--radius-lg) 0 0;
   flex-shrink: 0;
   height: 140px;
+  background: none;
+  border: none;
+  padding: 0;
 }
 
 .imagen {
@@ -72,7 +78,7 @@
 }
 
 /* Card body horizontal padding (applied to everything below the image) */
-.topRow, .titulo, .descArea, .metaGrid {
+.topRow, .tituloWrap, .descArea, .metaGrid {
   padding-left: 1.25rem;
   padding-right: 1.25rem;
 }
@@ -164,23 +170,32 @@
   cursor: pointer;
 }
 
-/* ── Title: clamped to 2 lines with ellipsis ── */
+.tituloWrap { flex-shrink: 0; }
+
+/* ── Title: clamped to 2 lines with ellipsis. Real <button> for keyboard access,
+   with its default chrome stripped so it still looks like a heading. ── */
 .titulo {
+  display: -webkit-box;
+  width: 100%;
+  background: none;
+  border: none;
+  margin: 0;
+  padding: 0;
+  text-align: left;
+  font-family: inherit;
   font-size: 1rem;
   font-weight: 700;
   line-height: 1.3;
   color: var(--text);
-  flex-shrink: 0;
   cursor: pointer;
-  display: -webkit-box;
   -webkit-line-clamp: 2;
   -webkit-box-orient: vertical;
   overflow: hidden;
   text-overflow: ellipsis;
   transition: color 0.15s;
 }
-.titulo:hover { color: var(--accent); }
-.tachado { text-decoration: line-through; color: var(--text-muted); }
+.titulo:hover, .titulo:focus-visible { color: var(--accent); }
+.tituloWrap.tachado .titulo { text-decoration: line-through; color: var(--text-muted); }
 
 /* ── Description area: flexes to absorb leftover space so meta/progress
    always sit at the same spot near the bottom of the fixed-height card ── */
